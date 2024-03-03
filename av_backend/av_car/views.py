@@ -1,17 +1,17 @@
-from rest_framework import generics
-from .serializers import *
-from .models import *
-import datetime
-
-now = datetime.datetime.now()
+from .models import Car
+from .serializers import CarSerializer
+from rest_framework import viewsets, permissions
+from django.shortcuts import render
 
 
-class CarListCreate(generics.ListAPIView):
+class CarViewSet(viewsets.ModelViewSet):
     queryset = Car.objects.all()
+    permission_classes = [
+        permissions.AllowAny
+    ]
     serializer_class = CarSerializer
 
 
-# @api_view(['GET', 'POST'])
-# def car_list(request):
-#     queryset = Car.objects.all()
-#     return queryset
+def car_list(request):
+    car = Car.objects.all()
+    return render(request, 'av_car/index.html', {'car': car})
