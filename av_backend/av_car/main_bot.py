@@ -1,7 +1,10 @@
+from django.conf import settings
 from telebot.async_telebot import AsyncTeleBot
 import aiohttp
 
-bot = AsyncTeleBot('6613313841:AAEyd57MKTPC-pL13saMn5sDl2pxFzTf3Hk')
+
+# '6613313841:AAEyd57MKTPC-pL13saMn5sDl2pxFzTf3Hk'
+bot = AsyncTeleBot(settings.TOKEN_BOT, parse_mode='html')
 
 
 # Handle '/start' and '/help'

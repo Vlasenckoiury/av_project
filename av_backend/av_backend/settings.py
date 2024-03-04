@@ -19,6 +19,7 @@ DEBUG = True
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
 CORS_ALLOWED_WHITELIST = ('http://localhost:3000')
+TOKEN_BOT = '6613313841:AAEyd57MKTPC-pL13saMn5sDl2pxFzTf3Hk'
 
 # Application definition
 
@@ -133,3 +134,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATICFILES_DIRS = [
     BASE_DIR / "av_car/static",
 ]
+
+LOG_LEVEL = DEBUG
