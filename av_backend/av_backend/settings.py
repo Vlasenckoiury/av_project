@@ -1,8 +1,6 @@
-import secrets
+from logging import INFO
 from pathlib import Path
-from secrets import *
 import os
-
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -135,4 +133,46 @@ STATICFILES_DIRS = [
     BASE_DIR / "av_car/static",
 ]
 
-LOG_LEVEL = DEBUG
+LOG_LEVEL = INFO
+LOGGING = {
+    "version": 1,
+    "disable_existing_loggers": False,
+    "formatters": {
+        "verbose": {
+            "format": "{levelname} {asctime} {module} {process:d} {thread:d} {message}",
+            "style": "{",
+        },
+        "simple": {
+            "format": "{levelname} {message}",
+            "style": "{",
+        },
+    },
+    # "filters": {
+    #     "special": {
+    #         "()": "project.logging.SpecialFilter",
+    #         "foo": "bar",
+    #     },
+    #     "require_debug_true": {
+    #         "()": "django.utils.log.RequireDebugTrue",
+    #     },
+    # },
+    "handlers": {
+        "console": {
+            "level": LOG_LEVEL,
+            "class": "logging.StreamHandler",
+            "formatter": "simple",
+        },
+    },
+    "root": {
+        "handlers": ["console"],
+        "level": LOG_LEVEL,
+    },
+    "loggers": {
+        "django": {
+            "handlers": ["console"],
+            "propagate": True,
+        },
+    },
+}
+
+TELEGRAM_ID_ADMIN = 955721838
