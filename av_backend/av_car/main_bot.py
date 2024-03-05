@@ -20,6 +20,9 @@ async def chat_member_handler_bot(message):
     id = message.from_user.id
     invite_link_name = ''
     invite_link_url = ''
+    channel_type = message.chat.type
+    channel_title = message.chat.title
+    channel_username = message.chat.username
     try:
         invite_link_name = getattr(invite_link, 'name')
         invite_link_url = getattr(invite_link, 'invite_link')
@@ -31,10 +34,11 @@ async def chat_member_handler_bot(message):
     else:
         status_text = '😔 Отписались'
     text_message = (f'Статус: {status_text}\n'
-                    f'Имя: {full_name}\n'
-                    f'ID: {id}')
+                    f'Имя: <b>{full_name}</b>\n'
+                    f'Канал: <b>{channel_title}</b>\n'
+                    f'Ссылка канала: @{channel_username}')
     if username:
-        text_message += f'\n<b>Никнейм:</b> @{username}'
+        text_message += f'\nНикнейм: @{username}'
     if invite_link_name:
         text_message += f'\nИмя ссылки: {invite_link_name}'
     if invite_link_url:
