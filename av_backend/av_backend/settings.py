@@ -28,7 +28,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'av_car',
+    'av_car.apps.AvCarConfig',
     'rest_framework',
     'corsheaders',
 ]
@@ -134,6 +134,19 @@ STATICFILES_DIRS = [
 ]
 
 LOG_LEVEL = INFO
+# LOGGING = {
+#     "version": 1,
+#     "disable_existing_loggers": False,
+#     "handlers": {
+#         "console": {
+#             "class": "logging.StreamHandler",
+#         },
+#     },
+#     "root": {
+#         "обработчики": ["консоль"],
+#         "уровень": "ПРЕДУПРЕЖДЕНИЕ",
+#     },
+# }
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -147,15 +160,6 @@ LOGGING = {
             "style": "{",
         },
     },
-    # "filters": {
-    #     "special": {
-    #         "()": "project.logging.SpecialFilter",
-    #         "foo": "bar",
-    #     },
-    #     "require_debug_true": {
-    #         "()": "django.utils.log.RequireDebugTrue",
-    #     },
-    # },
     "handlers": {
         "console": {
             "level": LOG_LEVEL,
