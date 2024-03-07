@@ -1,18 +1,16 @@
-import logging
 import telebot
 from django.conf import settings
-from telebot.async_telebot import AsyncTeleBot
-import aiohttp
+from telebot import types
+from av_project.av_backend.av_car.db_tg import *
 
-
-bot = AsyncTeleBot(settings.TOKEN_BOT, parse_mode='HTML')
-telebot.logger.setLevel(settings.LOG_LEVEL)
-
-logger = logging.getLogger(__name__)
+bot = telebot.TeleBot(settings.TOKEN_BOT, parse_mode='HTML')
+# telebot.logger.setLevel(settings.LOG_LEVEL)
+#
+# logger = logging.getLogger(__name__)
 
 
 @bot.chat_member_handler()
-async def chat_member_handler_bot(message):
+def chat_member_handler_bot(message):  # функция, которая присылает кто подписался на канал
     status = message.difference.get('status')
     invite_link = message.invite_link
     full_name = message.from_user.full_name
@@ -20,21 +18,22 @@ async def chat_member_handler_bot(message):
     id = message.from_user.id
     invite_link_name = ''
     invite_link_url = ''
-    channel_type = message.chat.type
     channel_title = message.chat.title
     channel_username = message.chat.username
     try:
         invite_link_name = getattr(invite_link, 'name')
         invite_link_url = getattr(invite_link, 'invite_link')
     except AttributeError as err:
-        logger.info(f'Не получил пригласительную ссылку: {err}')
+        print(f'Не получил пригласительную ссылку: {err}')
+        # logger.info(f'Не получил пригласительную ссылку: {err}')
     current_subscriber_status = status[1]
-    if current_subscriber_status == 'creator':
+    if current_subscriber_status == 'member':
         status_text = '🚀 Подписались'
     else:
         status_text = '😔 Отписались'
     text_message = (f'Статус: {status_text}\n'
                     f'Имя: <b>{full_name}</b>\n'
+                    f'ID: <b>{id}</b>\n'
                     f'Канал: <b>{channel_title}</b>\n'
                     f'Ссылка канала: @{channel_username}')
     if username:
@@ -43,16 +42,65 @@ async def chat_member_handler_bot(message):
         text_message += f'\nИмя ссылки: {invite_link_name}'
     if invite_link_url:
         text_message += f'\n<b>URL</b>: {invite_link_url}'
-    await bot.send_message(chat_id=settings.TELEGRAM_ID_ADMIN, text=text_message)
+    bot.send_message(chat_id=settings.TELEGRAM_ID_ADMIN, text=text_message)
 
 
 # Handle '/start' and '/help'
-@bot.message_handler(commands=['help', 'start'])
-async def send_welcome(message):
-    await bot.send_message(message.chat.id, """Добро пожаловать в Av Car 🚗""")
+@bot.message_handler(commands=['start'])
+def send_welcome(message):
+    bot.send_message(message.chat.id, """🚗""",)
+    bot.send_message(message.chat.id, """Добро пожаловать в Av Car\nВыберите команду в <b>Меню</b>""",)
+    user_id = message.from_user.id
+    username = f'@{message.from_user.username}'
+    first_name = message.from_user.first_name
+    last_name = message.from_user.last_name
+    return insert_tg(user_id, username, first_name, last_name)
 
 
-# Handle all other messages with content_type 'text' (content_types defaults to ['text'])
+@bot.message_handler(commands=['news'])
+def news(message):
+    try:
+        links = get_all_links()
+        if links:
+            reply_markup = types.InlineKeyboardMarkup()
+            for link in links:
+                button = types.InlineKeyboardButton(text=link[0], url=link[1])
+                reply_markup.add(button)
+            bot.send_message(message.chat.id, "<b></b> 📰")
+            bot.send_message(message.chat.id, "<b>Выберите Канал</b>", parse_mode='HTML', reply_markup=reply_markup)
+        else:
+            bot.send_message(message.chat.id, "Нет доступных каналов новостей.")
+    except Exception as e:
+        bot.reply_to(message, f"Произошла ошибка: {e}")
+        bot.reply_to(message, f"Произошла ошибка перезапустите бота /start")
+
+
+@bot.message_handler(commands=['site'])
+def echo_message(message):
+    reply_markup = types.InlineKeyboardMarkup()
+    button = types.InlineKeyboardButton(text='Открыть Сайт', url='https://av.by/')
+    reply_markup.add(button)
+    bot.send_message(message.from_user.id, "<b></b> 📰", parse_mode='HTML', reply_markup=reply_markup)
+
+
+@bot.message_handler(commands=['help'])
+def echo_message(message):
+    bot.send_message(message.chat.id, f'{message.from_user.first_name}\nВы можете обратиться в тех.поддержку по номеру:\n+375(29)111-11-11')
+    keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)  # Подключаем клавиатуру
+    button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)  # Указываем название кнопки, которая появится у пользователя
+    keyboard.add(button_phone) 
+    bot.send_message(message.chat.id, 'Также можете поделиться номером телефона 📱\nи менеджер Вам перезвонит', reply_markup=keyboard)
+
+
+@bot.message_handler(content_types=['contact'])
+def contact(message):
+    if message.contact is not None:
+        get_contact(message)
+
+
 @bot.message_handler(func=lambda message: True)
-async def echo_message(message):
-    await bot.reply_to(message, 'Упс ошибка 😔')
+def echo_message(message):
+    bot.reply_to(message, 'Упс ошибка 😔')
+
+
+bot.send_message(chat_id='@news_av_car', text='Вот новости')
