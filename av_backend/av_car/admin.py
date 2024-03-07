@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.db.models import ManyToOneRel
-
 from .models import *
 
 
@@ -9,16 +8,6 @@ from .models import *
 
 # admin.site.unregister(User)  # удаление Юзер
 # admin.site.unregister(Group)  # удаление группы
-
-class CarAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'description', 'price',)
-    search_fields = ('id', 'name')
-
-
-admin.site.register(Category),
-admin.site.register(Car, CarAdmin),
-
-
 def get_fields_for_model(db_model):  # функция которая возвращает все поля из модели
     fields = []
     for field in db_model._meta.get_fields():
@@ -26,6 +15,17 @@ def get_fields_for_model(db_model):  # функция которая возвр�
             continue
         fields.append(field.name)
     return fields
+
+
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ('name',)
+
+
+@admin.register(Car)
+class CarAdmin(admin.ModelAdmin):
+    list_display = ('id', 'name', 'description', 'price',)
+    search_fields = ('id', 'name')
 
 
 @admin.register(BotUser)
