@@ -4,9 +4,10 @@ from django.utils.translation import gettext as _
 
 
 class Category(models.Model):
-    name = models.CharField(max_length=200, db_index=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
 
     class Meta:
+        app_label = "av_car"
         ordering = ('name',)
         verbose_name = 'Категория'
         verbose_name_plural = 'Категории'
@@ -31,6 +32,7 @@ class Car(models.Model):
     updated = models.DateTimeField(auto_now=True)
 
     class Meta:
+        app_label = "av_car"
         ordering = ('name',)
         index_together = (('id', 'name'),)
 
@@ -43,18 +45,21 @@ class BotUser(models.Model):
     username = models.CharField(_('Username'), max_length=100, blank=True, null=True)
     first_name = models.CharField(_('Имя'), max_length=100, blank=True, null=True)
     last_name = models.CharField(_('Фамилия'), max_length=100, blank=True, null=True)
+    contact = models.CharField(_('Телефон'), max_length=100, blank=True, null=True)
 
     class Meta:
+        app_label = "av_car"
         verbose_name = 'Пользователь бота'
         verbose_name_plural = 'Пользователи бота'
 
     def __str__(self):
-        return f'{self.telegram_id}: {self.username}'
+        return f'{self.telegram_id} {self.username}'
 
 
 class TelegramChat(models.Model):
     bot_user = models.ForeignKey(BotUser, verbose_name=_('Пользователь бота'), on_delete=models.CASCADE)
     name = models.CharField(_('Имя канала'), max_length=150, blank=True, null=True)
+    chat_link = models.CharField(_('Ссылка канала'), max_length=150, blank=True, null=True)
 
     def __str__(self):
         return f'{self.name}'
