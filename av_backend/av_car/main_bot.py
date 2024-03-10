@@ -76,7 +76,7 @@ def news(message):
 
 
 @bot.message_handler(commands=['site'])
-def echo_message(message):
+def site(message):
     reply_markup = types.InlineKeyboardMarkup()
     button = types.InlineKeyboardButton(text='Открыть Сайт', url='https://av.by/')
     reply_markup.add(button)
@@ -84,7 +84,7 @@ def echo_message(message):
 
 
 @bot.message_handler(commands=['help'])
-def echo_message(message):
+def get_contact(message):
     bot.send_message(message.chat.id, f'{message.from_user.first_name}\nВы можете обратиться в тех.поддержку по номеру:\n+375(29)111-11-11')
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)  # Подключаем клавиатуру
     button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)  # Указываем название кнопки, которая появится у пользователя
@@ -101,6 +101,3 @@ def contact(message):
 @bot.message_handler(func=lambda message: True)
 def echo_message(message):
     bot.reply_to(message, 'Упс ошибка 😔')
-
-
-bot.send_message(chat_id='@news_av_car', text='Вот новости')
