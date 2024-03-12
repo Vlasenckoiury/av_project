@@ -84,7 +84,7 @@ def site(message):
 
 
 @bot.message_handler(commands=['help'])
-def get_contact(message):
+def help(message):
     bot.send_message(message.chat.id, f'{message.from_user.first_name}\nВы можете обратиться в тех.поддержку по номеру:\n+375(29)111-11-11')
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)  # Подключаем клавиатуру
     button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)  # Указываем название кнопки, которая появится у пользователя
