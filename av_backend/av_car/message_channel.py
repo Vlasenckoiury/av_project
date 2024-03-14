@@ -1,12 +1,8 @@
-import logging
-
+# import logging
 import pytz
 import schedule
-import time
 import telebot
 from django.conf import settings
-# from telebot import types
-# from telegram import Bot
 
 from av_project.av_backend.av_car.db_tg import *
 from datetime import datetime
@@ -29,30 +25,38 @@ def send_message():
 
 
 def scheduled_message():
-    new_records = get_time()
-    if new_records:
-        now = datetime.now(pytz.timezone('Europe/Moscow'))
-        current_time = now.time()
-        start_time = new_records[0][0]
-        end_time = time(hour=7, minute=00, second=0)
-        if (start_time <= current_time <= end_time
-            or start_time >= current_time <= end_time
-                or start_time <= current_time >= end_time):
-            logger.info("Текущее время заданно в диапазоне заданному времени")
-            send_message()
+    week_day = get_week_day()
+    key_week = {0: week_day[0][0],
+                1: week_day[0][1],
+                2: week_day[0][2],
+                3: week_day[0][3],
+                4: week_day[0][4],
+                5: week_day[0][5],
+                6: week_day[0][6]}
+    today_weekday = datetime.now().weekday()
+    if today_weekday in key_week and key_week[today_weekday] == True:
+        new_records = get_time()
+        if new_records:
+            now = datetime.now(pytz.timezone('Europe/Moscow'))
+            current_time = now.time()
+            start_time = new_records[0][0]
+            end_time = new_records[0][1]
+            if start_time < end_time and start_time <= current_time <= end_time:
+                logger.info("Текущее время заданно в диапазоне заданному времени")
+                send_message()
+            elif start_time > end_time and (start_time >= current_time <= end_time or
+                   start_time <= current_time >= end_time):
+                send_message()
+            else:
+                logger.info("Текущее время заданно вне диапазоне заданному времени ")
+    else:
+        if any(key_week) == False:
+            logger.info('Если не выбран ни один день, то будет отправлять во все дни')
         else:
-            logger.info("Текущее время заданно вне диапазоне заданному времени")
-    # if start >= curr <= end_time or start <= curr >= end_time:
-        #     logger.info("Текущее время заданно в диапазоне заданному времени")
-        # if current_time <= start_time and current_time <= end_time or current_time <= start_time and current_time <= end_time:
-        #     logger.info("Текущее время заданно в диапазоне заданному времени")
-        #     send_message()
-        # else:
-        #     logger.info("Текущее время вне заданного времени")
+            logger.info(f'Ошибка с днями неделями')
 
 
-schedule.every().seconds.do(scheduled_message)
+schedule.every(5).seconds.do(scheduled_message)
 
 while True:
     schedule.run_pending()
-    # time.sleep(1)
