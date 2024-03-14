@@ -62,7 +62,7 @@ def get_contact(cursor, message):
 @db_connection
 def get_time(cursor):
     # cursor.execute("SELECT start_time FROM av_car_newmessage WHERE created_at >= NOW() - INTERVAL '1 day'")
-    cursor.execute("SELECT start_time FROM av_car_newmessage")
+    cursor.execute("SELECT start_time, end_time FROM av_car_newmessage")
     new_records = cursor.fetchall()
     return new_records
 
@@ -78,5 +78,22 @@ def get_channel(cursor):
         # cursor.execute("SELECT link_chat_id, message FROM av_car_newmessage")
         rows = cursor.fetchall()
         return rows
+    except Exception as err:
+        logging.info(f'Данные не получены {err}')
+
+
+@db_connection
+def get_week_day(cursor):
+    try:
+        cursor.execute("SELECT day_monday, " 
+                       "day_tuesday, "
+                       "day_wednesday, "
+                       "day_thursday, "
+                       "day_friday, "
+                       "day_saturday, "
+                       "day_sunday "
+                       "FROM av_car_newmessage")
+        week = cursor.fetchall()
+        return week
     except Exception as err:
         logging.info(f'Данные не получены {err}')
