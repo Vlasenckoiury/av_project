@@ -1,12 +1,14 @@
+import logging
+
 import telebot
 from django.conf import settings
 from telebot import types
 from av_project.av_backend.av_car.db_tg import *
 
 bot = telebot.TeleBot(settings.TOKEN_BOT, parse_mode='HTML')
-# telebot.logger.setLevel(settings.LOG_LEVEL)
-#
-# logger = logging.getLogger(__name__)
+telebot.logger.setLevel(settings.LOG_LEVEL)
+
+logger = logging.getLogger(__name__)
 
 
 @bot.chat_member_handler()
@@ -25,7 +27,7 @@ def chat_member_handler_bot(message):  # функция, которая прис
         invite_link_url = getattr(invite_link, 'invite_link')
     except AttributeError as err:
         print(f'Не получил пригласительную ссылку: {err}')
-        # logger.info(f'Не получил пригласительную ссылку: {err}')
+        logger.info(f'Не получил пригласительную ссылку: {err}')
     current_subscriber_status = status[1]
     if current_subscriber_status == 'member':
         status_text = '🚀 Подписались'
@@ -84,11 +86,11 @@ def site(message):
 
 
 @bot.message_handler(commands=['help'])
-def get_contact(message):
+def help(message):
     bot.send_message(message.chat.id, f'{message.from_user.first_name}\nВы можете обратиться в тех.поддержку по номеру:\n+375(29)111-11-11')
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)  # Подключаем клавиатуру
     button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)  # Указываем название кнопки, которая появится у пользователя
-    keyboard.add(button_phone) 
+    keyboard.add(button_phone)
     bot.send_message(message.chat.id, 'Также можете поделиться номером телефона 📱\nи менеджер Вам перезвонит', reply_markup=keyboard)
 
 
