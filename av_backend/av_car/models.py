@@ -1,6 +1,8 @@
 ## -*- coding: utf-8 -*-
 from django.db import models
 from django.utils.translation import gettext as _
+from django.utils import timezone
+import pytz
 
 
 class Category(models.Model):
@@ -57,12 +59,13 @@ class BotUser(models.Model):
 
 
 class TelegramChat(models.Model):
-    bot_user = models.ForeignKey(BotUser, verbose_name=_('Пользователь бота'), on_delete=models.CASCADE)
-    name = models.CharField(_('Имя канала'), max_length=150, blank=True, null=True)
-    chat_link = models.CharField(_('Ссылка канала'), max_length=150, blank=True, null=True)
+    name = models.CharField(_('Имя канала'),
+                            max_length=150, blank=True, null=True, help_text='Имя Канала')
+    chat_link = models.CharField(_('Ссылка канала'),
+                                 max_length=150, db_index=True, help_text='Пример ссылки: @test_test')
 
     def __str__(self):
-        return f'{self.name}'
+        return f'{self.chat_link} {self.name}'
 
     class Meta:
         verbose_name = 'Телеграм канал'
@@ -91,7 +94,7 @@ class InviteLink(models.Model):
 
 
 class TelegramSubscriber(models.Model):
-    invite_link = models.ForeignKey(TelegramChat, verbose_name=_('Пригласительная ссылка'), on_delete=models.CASCADE)
+    invite_link = models.ForeignKey(TelegramChat, verbose_name=_('Канал'), on_delete=models.CASCADE)
     telegram_id = models.PositiveBigIntegerField(_('ID Telegram'), db_index=True, unique=True)
     username = models.CharField(_('Username'), max_length=100, blank=True, null=True)
     first_name = models.CharField(_('Имя'), max_length=100, blank=True, null=True)
@@ -106,3 +109,18 @@ class TelegramSubscriber(models.Model):
     class Meta:
         verbose_name = 'Подписчик'
         verbose_name_plural = 'Подписчики'
+
+
+class NewMessage(models.Model):
+    link_chat = models.ForeignKey(TelegramChat, on_delete=models.CASCADE, verbose_name=_('Канал'), related_name='messages')
+    message = models.TextField((_('Новость')))
+    start_time = models.TimeField(_('Время начало'), blank=True, null=True, help_text='Пример ввода времени: 10:00:00')
+    end_time = models.TimeField(_('Время конца'), blank=True, null=True, help_text='Пример ввода времени: 10:00:00')
+    created_at = models.DateTimeField(_('Время добавления новости'), blank=True, null=True, auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.message}'
+
+    class Meta:
+        verbose_name = 'Новости и расписание канала'
+        verbose_name_plural = 'Новости и расписание каналов'
