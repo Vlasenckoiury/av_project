@@ -114,9 +114,32 @@ class TelegramSubscriber(models.Model):
 class NewMessage(models.Model):
     link_chat = models.ForeignKey(TelegramChat, on_delete=models.CASCADE, verbose_name=_('Канал'), related_name='messages')
     message = models.TextField((_('Новость')))
-    start_time = models.TimeField(_('Время начало'), blank=True, null=True, help_text='Пример ввода времени: 10:00:00')
-    end_time = models.TimeField(_('Время конца'), blank=True, null=True, help_text='Пример ввода времени: 10:00:00')
+    start_time = models.TimeField(_('Время начало'), blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
+    end_time = models.TimeField(_('Время конца'), blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
     created_at = models.DateTimeField(_('Время добавления новости'), blank=True, null=True, auto_now_add=True)
+    day_monday = models.BooleanField(_('Понедельник'), default=False)
+    day_tuesday = models.BooleanField(_('Вторник'), default=False)
+    day_wednesday = models.BooleanField(_('Среда'), default=False)
+    day_thursday = models.BooleanField(_('Четверг'), default=False)
+    day_friday = models.BooleanField(_('Пятница'), default=False)
+    day_saturday = models.BooleanField(_('Суббота'), default=False)
+    day_sunday = models.BooleanField(_('Воскресенье'), default=False)
+
+    def boolean_to_int(self):
+        days = {
+            self.day_monday: 0,
+            self.day_tuesday: 1,
+            self.day_wednesday: 2,
+            self.day_thursday: 3,
+            self.day_friday: 4,
+            self.day_saturday: 5,
+            self.day_sunday: 6
+        }
+        res = [value for day, value in days.items() if day]
+        if res:
+            return res[0]
+        else:
+            return res
 
     def __str__(self):
         return f'{self.message}'
