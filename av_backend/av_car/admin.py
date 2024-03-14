@@ -51,3 +51,9 @@ class InviteLinkAdmin(admin.ModelAdmin):
 class TelegramSubscriberAdmin(admin.ModelAdmin):
     list_display = get_fields_for_model(TelegramSubscriber)
     list_filter = ['telegram_id']
+
+
+@admin.register(NewMessage)
+class NewMessageAdmin(admin.ModelAdmin):
+    list_display = get_fields_for_model(NewMessage)
+    list_editable = ['message']
