@@ -1,9 +1,10 @@
 import logging
-
 import telebot
 from django.conf import settings
 from telebot import types
+
 from av_project.av_backend.av_car.db_tg import *
+from django.core.exceptions import ObjectDoesNotExist
 
 bot = telebot.TeleBot(settings.TOKEN_BOT, parse_mode='HTML')
 telebot.logger.setLevel(settings.LOG_LEVEL)
@@ -77,6 +78,30 @@ def news(message):
         bot.reply_to(message, f"Произошла ошибка перезапустите бота /start")
 
 
+@bot.message_handler(commands=['ask'])
+def ask_command(message):
+    bot.send_message(message.chat.id, "Вы можете Задать вопрос ❓\nИ менеджер Вам ответит как можно быстрее!")
+    bot.register_next_step_handler(message, ask_message)
+
+
+def ask_message(message):
+    text = message.text
+    chat_id = message.chat.id
+    try:
+        res = get_answer(chat=chat_id, message=text)
+        existing_message = old_ask(chat=chat_id, message=text)
+        new = new_ask(chat=chat_id, message=text)
+        if existing_message:
+            bot.send_message(chat_id, "Этот вопрос уже был задан. Ждите ответа менеджера.")
+        elif res:
+            bot.send_message(chat_id, f'На Ваш вопрос (<b>{text}</b>) ответ получен.')
+            bot.send_message(chat_id, res)
+        elif new:
+            bot.send_message(chat_id, "Этот вопрос не был задан\nЯ ваш вопрос передал менеджеру\nОн ответит Вам в ближайшее время.")
+    except Exception as err:
+        bot.send_message(chat_id, f"Ваш вопрос не получен, возникла ошибка")
+
+
 @bot.message_handler(commands=['site'])
 def site(message):
     reply_markup = types.InlineKeyboardMarkup()
@@ -91,7 +116,7 @@ def help(message):
     keyboard = types.ReplyKeyboardMarkup(row_width=1, resize_keyboard=True)  # Подключаем клавиатуру
     button_phone = types.KeyboardButton(text="Отправить телефон", request_contact=True)  # Указываем название кнопки, которая появится у пользователя
     keyboard.add(button_phone)
-    bot.send_message(message.chat.id, 'Также можете поделиться номером телефона 📱\nи менеджер Вам перезвонит', reply_markup=keyboard)
+    bot.send_message(message.chat.id, 'Также можете поделиться номером телефона 📱\nи менеджер Вам перезвонит 📲', reply_markup=keyboard)
 
 
 @bot.message_handler(content_types=['contact'])
