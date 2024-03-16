@@ -57,3 +57,10 @@ class TelegramSubscriberAdmin(admin.ModelAdmin):
 class NewMessageAdmin(admin.ModelAdmin):
     list_display = get_fields_for_model(NewMessage)
     list_editable = ['message', 'start_time', 'end_time']
+
+
+@admin.register(AskMessage)
+class AskMessage(admin.ModelAdmin):
+    list_display = get_fields_for_model(AskMessage)
+    list_editable = ['answer']
+    list_filter = get_fields_for_model(AskMessage)
