@@ -4,8 +4,6 @@ import logging
 import psycopg2
 from functools import wraps
 
-# from av_project.av_backend.av_car.main_bot import *
-
 
 def db_connection(func):
     @wraps(func)
@@ -75,7 +73,6 @@ def get_channel(cursor):
         FROM av_car_newmessage
         INNER JOIN av_car_telegramchat ON av_car_newmessage.link_chat_id = av_car_telegramchat.id;
         """)
-        # cursor.execute("SELECT link_chat_id, message FROM av_car_newmessage")
         rows = cursor.fetchall()
         return rows
     except Exception as err:
@@ -97,3 +94,34 @@ def get_week_day(cursor):
         return week
     except Exception as err:
         logging.info(f'Данные не получены {err}')
+
+
+@db_connection
+def old_ask(cursor, chat, message):
+    try:
+        cursor.execute("SELECT * FROM av_car_askmessage WHERE chat_id = %s AND question = %s AND answer = null", (chat, message))
+        row = cursor.fetchall()
+        return row
+    except Exception as err:
+        logging.info(f'ID чата и текст не получены {err}')
+
+
+@db_connection
+def get_answer(cursor, chat, message):
+    try:
+        cursor.execute("SELECT answer FROM av_car_askmessage WHERE chat_id = %s AND question = %s AND answer IS NOT NULL AND answer != ''", (chat, message))
+        results = cursor.fetchall()
+        for ans in results:
+            return ans[0]
+    except Exception as err:
+        logging.info(f'{err}')
+
+
+@db_connection
+def new_ask(cursor, chat, message):
+    try:
+        cursor.execute("INSERT INTO av_car_askmessage (chat_id, question) VALUES (%s, %s);", (chat, message))
+        logging.info(f'Вопрос отправлен')
+        return True
+    except Exception as err:
+        logging.info(f'Вопрос не отправлен {err}')
