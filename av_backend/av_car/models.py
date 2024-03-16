@@ -19,19 +19,19 @@ class Category(models.Model):
 
 
 class Car(models.Model):
-    category = models.ForeignKey(Category, related_name='av_car', on_delete=models.CASCADE)
-    name = models.CharField(max_length=200, db_index=True)
-    price = models.CharField(max_length=50)
-    price_usd = models.CharField(max_length=50)
-    image = models.TextField(max_length=1000)
-    parameter = models.TextField(max_length=500)
-    description = models.TextField(max_length=500)
-    modification = models.TextField(max_length=500)
-    all_modification = models.TextField(max_length=500)
-    location = models.TextField(max_length=500)
-    comment = models.TextField(max_length=500)
-    created = models.DateTimeField(auto_now_add=True)
-    updated = models.DateTimeField(auto_now=True)
+    category = models.ForeignKey(Category, related_name='av_car', on_delete=models.CASCADE, blank=True, null=True)
+    name = models.CharField(max_length=200, blank=True, null=True)
+    price = models.CharField(max_length=50, blank=True, null=True)
+    price_usd = models.CharField(max_length=50, blank=True, null=True)
+    image = models.TextField(max_length=1000, blank=True, null=True)
+    parameter = models.TextField(max_length=500, blank=True, null=True)
+    description = models.TextField(max_length=500, blank=True, null=True)
+    modification = models.TextField(max_length=500, blank=True, null=True)
+    all_modification = models.TextField(max_length=500, blank=True, null=True)
+    location = models.TextField(max_length=500, blank=True, null=True)
+    comment = models.TextField(max_length=500, blank=True, null=True)
+    created = models.DateTimeField(auto_now_add=True, blank=True, null=True)
+    updated = models.DateTimeField(auto_now=True, blank=True, null=True)
 
     class Meta:
         app_label = "av_car"
@@ -62,7 +62,7 @@ class TelegramChat(models.Model):
     name = models.CharField(_('Имя канала'),
                             max_length=150, blank=True, null=True, help_text='Имя Канала')
     chat_link = models.CharField(_('Ссылка канала'),
-                                 max_length=150, db_index=True, help_text='Пример ссылки: @test_test')
+                                 max_length=150, db_index=True, help_text='Пример ссылки: https://t.me/test')
 
     def __str__(self):
         return f'{self.chat_link} {self.name}'
@@ -114,8 +114,8 @@ class TelegramSubscriber(models.Model):
 class NewMessage(models.Model):
     link_chat = models.ForeignKey(TelegramChat, on_delete=models.CASCADE, verbose_name=_('Канал'), related_name='messages')
     message = models.TextField((_('Новость')))
-    start_time = models.TimeField(_('Время начало'), blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
-    end_time = models.TimeField(_('Время конца'), blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
+    start_time = models.TimeField(_('Время начало'), default=None, blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
+    end_time = models.TimeField(_('Время конца'), default=None, blank=True, null=False, help_text='Пример ввода времени: 10:00:00')
     created_at = models.DateTimeField(_('Время добавления новости'), blank=True, null=True, auto_now_add=True)
     day_monday = models.BooleanField(_('Понедельник'), default=False)
     day_tuesday = models.BooleanField(_('Вторник'), default=False)
@@ -147,3 +147,18 @@ class NewMessage(models.Model):
     class Meta:
         verbose_name = 'Новости и расписание канала'
         verbose_name_plural = 'Новости и расписание каналов'
+
+
+class AskMessage(models.Model):
+    chat_id = models.BigIntegerField(_('Чат Id'), default=False, blank=True, null=True)
+    question = models.TextField(_('Вопрос'), default=None, blank=True, null=True)
+    answer = models.TextField(_('Ответ'), default=False, blank=True, null=True)
+    result = models.BooleanField(_('Результат'), default=False, help_text='Отметьте если ответили на вопрос', blank=True, null=True)
+    created_at = models.DateTimeField(_('Время добавления'), blank=True, null=True, auto_now_add=True)
+
+    def __str__(self):
+        return f'{self.question}'
+
+    class Meta:
+        verbose_name = 'Вопрос и Ответ'
+        verbose_name_plural = 'Вопросы и Ответы'
