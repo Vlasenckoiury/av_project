@@ -97,7 +97,7 @@ def ask_message(message):
             bot.send_message(chat_id, f'На Ваш вопрос (<b>{text}</b>) ответ получен.')
             bot.send_message(chat_id, res)
         elif new:
-            bot.send_message(chat_id, "Этот вопрос не был задан\nЯ ваш вопрос передал менеджеру\nОн ответит Вам в ближайшее время.")
+            bot.send_message(chat_id, "Я ваш вопрос передал менеджеру\nОн ответит Вам в ближайшее время.")
     except Exception as err:
         bot.send_message(chat_id, f"Ваш вопрос не получен, возникла ошибка")
 

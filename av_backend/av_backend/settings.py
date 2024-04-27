@@ -1,24 +1,43 @@
 from logging import INFO
 from pathlib import Path
+from environs import Env
 import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+env = Env()
+env.read_env()
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-n%am(*678s1n=so9g0jufhjuei&=34np4*!#+gckori#it_dr5'
+SECRET_KEY = env.str('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+TOKEN_BOT = env.str('TOKEN_BOT')
+
 ALLOWED_HOSTS = ['*']
 CORS_ORIGIN_ALLOW_ALL = True
-CORS_ALLOWED_WHITELIST = ('http://localhost:3000')
-TOKEN_BOT = '6613313841:AAEyd57MKTPC-pL13saMn5sDl2pxFzTf3Hk'
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = ['*']
+CORS_ORIGIN_WHITELIST = ('http://localhost:3000/')
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:8000",
+]
+
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -81,12 +100,12 @@ WSGI_APPLICATION = 'av_backend.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'postgres',
-        'USER': 'postgres',
-        'PASSWORD': 'postgres',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME': os.getenv('DB_NAME'),
+        'USER': os.getenv('DB_USER'),
+        'PASSWORD': os.getenv('DB_PASSWORD'),
+        'HOST': os.getenv('DB_HOST'),
+        'PORT': os.getenv('DB_PORT'),
     }
 }
 
@@ -179,4 +198,4 @@ LOGGING = {
     },
 }
 
-TELEGRAM_ID_ADMIN = 955721838
+TELEGRAM_ID_ADMIN = int(os.getenv('TELEGRAM_ID_ADMIN'))
