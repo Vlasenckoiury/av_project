@@ -19,7 +19,7 @@ def send_message():
     channel = get_channel()
     if channel:
         for result in channel:
-            bot_channel.send_message(chat_id=result[0], text=result[1])
+            bot_channel.send_message(chat_id=result[0], text=result[1])  # ошибка передать канал с @news_av_car
     else:
         logger.info(f'Сообщение не отправлено в канал')
 
